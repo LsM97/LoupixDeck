@@ -16,10 +16,11 @@ public static class DeviceRegistry
 
     public static readonly List<DeviceInfo> SupportedDevices =
     [
+        new("Loupedeck Live", "2ec2", "0004", typeof(LoupedeckLiveDevice)),
         new("Loupedeck Live S", "2ec2", "0006", typeof(LoupedeckLiveSDevice)),
         new("Razer Stream Controller", "1532", "0d06", typeof(RazerStreamControllerDevice))
+        //new DeviceInfo("Loupedeck CT", "2ec2", "0007", typeof(LoupedeckCTDevice))
     ];
-
     public static DeviceInfo GetDeviceByVidPid(string vid, string pid)
     {
         if (string.IsNullOrEmpty(vid) || string.IsNullOrEmpty(pid)) return null;
