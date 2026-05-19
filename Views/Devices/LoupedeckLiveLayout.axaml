@@ -15,8 +15,8 @@
             UnselectedBrush="{StaticResource UnselectedBrush}" />
     </UserControl.Resources>
 
-    <!-- Loupedeck Live: 3 knobs left, 4x3 touch grid, 3 knobs right, 8 buttons below -->
-    <Grid ColumnDefinitions="120,400,120" RowDefinitions="300,60,30">
+    <!-- Loupedeck Live: 3 knobs | left display | 4x3 touch grid | right display | 3 knobs -->
+    <Grid ColumnDefinitions="120,60,400,60,120" RowDefinitions="300,60,30">
         <!-- LEFT: 3 rotary knobs -->
         <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center"
               RowDefinitions="100,100,100" ColumnDefinitions="100">
@@ -43,8 +43,22 @@
             </Button>
         </Grid>
 
+        <!-- LEFT SIDE DISPLAY (60×270) — non-touch status/info strip -->
+        <Border Grid.Row="0" Grid.Column="1" Width="60" Height="270"
+                Background="#0A0A0A" BorderBrush="#222222" BorderThickness="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid RowDefinitions="90,90,90">
+                <Border Grid.Row="0" Background="Transparent" />
+                <Border Grid.Row="1" Background="Transparent">
+                    <TextBlock Text="◀" Foreground="#333333" FontSize="20"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <Border Grid.Row="2" Background="Transparent" />
+            </Grid>
+        </Border>
+
         <!-- CENTER: 4x3 touch grid -->
-        <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center"
+        <Grid Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center"
               ColumnDefinitions="100,100,100,100" RowDefinitions="100,100,100">
             <Button Tag="Touch" Grid.Row="0" Grid.Column="0" Width="90" Height="90"
                     Command="{Binding TouchButtonCommand}"
@@ -134,8 +148,21 @@
             </Button>
         </Grid>
 
+        <!-- RIGHT SIDE DISPLAY (60×270) — shows LOUPEDECK text like the real device -->
+        <Border Grid.Row="0" Grid.Column="3" Width="60" Height="270"
+                Background="#0A0A0A" BorderBrush="#222222" BorderThickness="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="LOUPEDECK" Foreground="#666666" FontSize="10"
+                       FontWeight="Bold" TextAlignment="Center"
+                       HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock.RenderTransform>
+                    <RotateTransform Angle="90" />
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Border>
+
         <!-- RIGHT: 3 rotary knobs -->
-        <Grid Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center"
+        <Grid Grid.Row="0" Grid.Column="4" HorizontalAlignment="Center"
               RowDefinitions="100,100,100" ColumnDefinitions="100">
             <Button Grid.Row="0" HorizontalAlignment="Center" Width="90" Height="90"
                     Background="Transparent" Command="{Binding RotaryButtonCommand}"
@@ -160,8 +187,8 @@
             </Button>
         </Grid>
 
-        <!-- BOTTOM: 8 physical buttons (below the grid, centred) -->
-        <Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center"
+        <!-- BOTTOM: 8 physical buttons (span across the whole width below grid+displays) -->
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Center"
               ColumnDefinitions="50,50,50,50,50,50,50,50" RowDefinitions="50">
             <Button Tag="Led" Grid.Row="0" Grid.Column="0" Width="45" Height="45"
                     Command="{Binding SimpleButtonCommand}"
@@ -221,8 +248,8 @@
             </Button>
         </Grid>
 
-        <!-- Touch page selector (below everything) -->
-        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+        <!-- Touch page selector (below everything, centred under grid) -->
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Orientation="Horizontal" HorizontalAlignment="Center">
             <ItemsControl ItemsSource="{Binding LoupedeckController.Config.TouchButtonPages}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
