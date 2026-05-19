@@ -105,38 +105,57 @@ public class LoupedeckDevice
     {
         if (!string.IsNullOrEmpty(Path))
         {
+            // Path explicitly specified — create connection and wire events
             _connection = new SerialConnection(Path, Baudrate);
+            _connection.Connected += (_, e) => OnConnect?.Invoke(this, e);
+            _connection.MessageReceived += (_, e) => OnReceive(e.Data);
+            _connection.Disconnected += (_, e) =>
+            {
+                OnDisconnect?.Invoke(this, e);
+                if (_suppressAutoReconnect) return;
+                Thread.Sleep(ReconnectInterval);
+                ConnectBlind();
+            };
+            _connection.Connect();
         }
         else
         {
-            if (!string.IsNullOrEmpty(Path) && Baudrate > 0)
+            // Auto-detect: try each serial port until one connects successfully
+            foreach (var port in System.IO.Ports.SerialPort.GetPortNames())
             {
-                _connection = new SerialConnection(Path, Baudrate);
-            }
-            else
-            {
-                OnDisconnect?.Invoke(this, new ConnectionEventArgs("N/A", new Exception("Device path is null")));
-                return;
+                var conn = new SerialConnection(port, Baudrate);
+                conn.Connected += (_, e) => OnConnect?.Invoke(this, e);
+                conn.MessageReceived += (_, e) => OnReceive(e.Data);
+                conn.Disconnected += (_, e) => OnDisconnect?.Invoke(this, e);
+
+                try
+                {
+                    conn.Connect();
+                    // Success! Wire up proper auto-reconnect
+                    conn.Disconnected += (_, e) =>
+                    {
+                        OnDisconnect?.Invoke(this, e);
+                        if (_suppressAutoReconnect) return;
+                        Thread.Sleep(ReconnectInterval);
+                        ConnectBlind();
+                    };
+
+                    _connection = conn;
+                    Path = port;
+                    break;
+                }
+                catch
+                {
+                    // Not this port — try next
+                }
             }
 
             if (_connection == null)
             {
-                OnDisconnect?.Invoke(this, new ConnectionEventArgs("N/A", new Exception("No device found")));
+                OnDisconnect?.Invoke(this, new ConnectionEventArgs("N/A", new Exception("No Loupedeck device found")));
                 return;
             }
         }
-
-        _connection.Connected += (_, e) => OnConnect?.Invoke(this, e);
-        _connection.MessageReceived += (_, e) => OnReceive(e.Data);
-        _connection.Disconnected += (_, e) =>
-        {
-            OnDisconnect?.Invoke(this, e);
-            if (_suppressAutoReconnect) return;
-            Thread.Sleep(ReconnectInterval);
-            ConnectBlind();
-        };
-
-        _connection.Connect();
 
         StartQueueWorker();
     }
