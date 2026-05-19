@@ -32,8 +32,8 @@ public class LoupedeckLiveDevice : LoupedeckDevice
         RotaryCount = 6;
         // 12 grid slots only (side panels are displays, NOT touch-capable on Live).
         TouchButtonCount = Columns * Rows;
-        // Centre grid sits between X=60 and X=420 on the unified 480px display.
-        VisibleX = [0, 480];
+        // Centre 4×3 grid sits between X=60 and X=420 on the unified 480px display.
+        VisibleX = [60, 420];
         VisibleY = [0, 270];
         Type = "Loupedeck Live";
         ProductId = "0004";
@@ -51,16 +51,16 @@ public class LoupedeckLiveDevice : LoupedeckDevice
         if (VisibleX == null || VisibleY == null)
             throw new InvalidOperationException("VisibleX or VisibleY cannot be null.");
 
-        // Left side panel (no touch key on original Live — return dummy).
-        if (x < 60)
+        // Left side panel (display only, not touch-capable on original Live).
+        if (x < VisibleX[0])
             return new TouchTarget { Screen = "center", Key = LeftSideIndex };
 
-        // Right side panel (no touch key on original Live — return dummy).
-        if (x >= 420)
+        // Right side panel (display only, not touch-capable on original Live).
+        if (x >= VisibleX[1])
             return new TouchTarget { Screen = "center", Key = RightSideIndex };
 
         // Centre 4×3 grid — clamp and translate into grid coords.
-        x = Math.Clamp(x, 60, 419) - 60;
+        x = Math.Clamp(x, VisibleX[0], VisibleX[1] - 1) - VisibleX[0];
         y = Math.Clamp(y, VisibleY[0], VisibleY[1]);
         var column = x / 90;
         var row = y / 90;
