@@ -30,8 +30,8 @@ public class LoupedeckLiveDevice : LoupedeckDevice
         Columns = 4;
         Rows = 3;
         RotaryCount = 6;
-        // 12 grid slots + 2 virtual side panels (rendered, not touch-capable).
-        TouchButtonCount = Columns * Rows + 2;
+        // 12 grid slots only (side panels are displays, NOT touch-capable on Live).
+        TouchButtonCount = Columns * Rows;
         // Centre grid sits between X=60 and X=420 on the unified 480px display.
         VisibleX = [0, 480];
         VisibleY = [0, 270];
