@@ -54,6 +54,7 @@ public partial class MainWindow : Window
         host.Content = vm.DeviceSlug switch
         {
             "razer-stream-controller" => new RazerStreamControllerLayout(),
+            "loupedeck-live" => new LoupedeckLiveLayout(),
             _ => new LoupedeckLiveSLayout()
         };
     }

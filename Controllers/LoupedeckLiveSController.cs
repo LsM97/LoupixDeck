@@ -620,20 +620,35 @@ public class LoupedeckLiveSController(
     /// </summary>
     private async Task<SimpleButton[]> BuildSimpleButtons()
     {
-        var defaults = new (Constants.ButtonType Id, string Cmd)[]
-        {
-            (Constants.ButtonType.BUTTON0, "System.PreviousPage"),
-            (Constants.ButtonType.BUTTON1, "System.PreviousRotaryPage"),
-            (Constants.ButtonType.BUTTON2, "System.NextRotaryPage"),
-            (Constants.ButtonType.BUTTON3, "System.NextPage"),
-            (Constants.ButtonType.BUTTON4, null),
-            (Constants.ButtonType.BUTTON5, null),
-            (Constants.ButtonType.BUTTON6, null),
-            (Constants.ButtonType.BUTTON7, null)
-        };
-
         var device = deviceService.Device;
         var count = device.Buttons?.Length ?? 0;
+
+        // Device-specific defaults: Loupedeck Live (8 buttons) gets numeric page selectors;
+        // Live S (6 buttons) keeps the classic nav layout.
+        var defaults = count >= 8
+            ? new (Constants.ButtonType Id, string Cmd)[]
+            {
+                (Constants.ButtonType.BUTTON0, "System.GotoPage(1)"),
+                (Constants.ButtonType.BUTTON1, "System.GotoPage(2)"),
+                (Constants.ButtonType.BUTTON2, "System.GotoPage(3)"),
+                (Constants.ButtonType.BUTTON3, "System.GotoPage(4)"),
+                (Constants.ButtonType.BUTTON4, "System.GotoPage(5)"),
+                (Constants.ButtonType.BUTTON5, "System.GotoPage(6)"),
+                (Constants.ButtonType.BUTTON6, "System.GotoPage(7)"),
+                (Constants.ButtonType.BUTTON7, "System.NextPage")
+            }
+            : new (Constants.ButtonType Id, string Cmd)[]
+            {
+                (Constants.ButtonType.BUTTON0, "System.PreviousPage"),
+                (Constants.ButtonType.BUTTON1, "System.PreviousRotaryPage"),
+                (Constants.ButtonType.BUTTON2, "System.NextRotaryPage"),
+                (Constants.ButtonType.BUTTON3, "System.NextPage"),
+                (Constants.ButtonType.BUTTON4, null),
+                (Constants.ButtonType.BUTTON5, null),
+                (Constants.ButtonType.BUTTON6, null),
+                (Constants.ButtonType.BUTTON7, null)
+            };
+
         var result = new SimpleButton[count];
         for (var i = 0; i < count && i < defaults.Length; i++)
         {
